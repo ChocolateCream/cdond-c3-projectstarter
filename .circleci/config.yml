@@ -47,7 +47,7 @@ jobs:
                 name: Build front-end
                 command: |
                     cd frontend
-                    npm install -g npm@latest
+                    sudo npm install -g npm@latest
                     npm run build
             - save_cache:
                 paths: [frontend/node_modules]
