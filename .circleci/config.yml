@@ -166,6 +166,26 @@ jobs:
                 mystack: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
             # Here's where you will add some code to rollback on failure
 
+    # configure-infrastructure:
+    #     docker:
+    #         - image: python:3.7-alpine3.11
+    #     steps:
+    #         - checkout
+    #         - add_ssh_keys:
+    #             fingerprints: ["bf:83:9f:67:ae:25:38:d2:7a:9d:4b:9b:a4:14:d4:19"]
+    #         - run:
+    #             name: Install dependencies
+    #             command: apk add --update ansible
+    #         - attach_workspace:
+    #             at: ~/
+    #         - run:
+    #             name: Configure server
+    #             command: |
+    #                 cd .circleci/ansible
+    #                 ansible-playbook -i inventory.txt configure-server.yml
+    #         # Here's where you will add some code to rollback on failure
+
+
     configure-infrastructure:
         docker:
             - image: python:3.7-alpine3.11
@@ -183,7 +203,7 @@ jobs:
                 command: |
                     cd .circleci/ansible
                     ansible-playbook -i inventory.txt configure-server.yml
-            # Here's where you will add some code to rollback on failure
+
 
 #     run-migrations:
 #         docker:
