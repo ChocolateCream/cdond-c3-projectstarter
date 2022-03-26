@@ -13,10 +13,10 @@
     - ansible_stdout_callback: yaml
 
   pre_tasks:
-    ## 10 minutes is a long time so making it just 1 minute
+    ## 10 minutes is a long time and no need to wait at all, so making the time 10 secs
     - name: "wait 600 seconds for target connection to become reachable/usable."
       pause:
-        seconds: 60
+        seconds: 10
 
     # - name: "install python for Ansible."
     # The ubuntu 20.04 image over AWS comes with Python3
