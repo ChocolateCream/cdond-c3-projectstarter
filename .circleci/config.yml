@@ -4,14 +4,17 @@ commands:
     destroy-environment:
         description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
         parameters:
-            mystack:
+            workflowID:
                 type: string
         steps:
             - run:
                 name: Destroy environments
                 when: on_fail
                 command: |
-                    aws cloudformation delete-stack --stack-name <<parameters.mystack>>
+                    aws cloudformation delete-stack \
+                    --stack-name udapeople-backend-<<parameters.workflowID>>
+                    aws cloudformation delete-stack \
+                    --stack-name udapeople-frontend-<<parameters.workflowID>>
 
 #     revert-migrations:
 #         description: Revert the last migration if successfully run in the current workflow.
@@ -160,11 +163,9 @@ jobs:
                 root: ~/
                 paths:
                     - project/.circleci/ansible/inventory.txt
-            - destroy-environment:
-                mystack: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-            - destroy-environment:
-                mystack: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
             # Here's where you will add some code to rollback on failure
+            - destroy-environment:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
     # configure-infrastructure:
     #     docker:
@@ -185,17 +186,19 @@ jobs:
     #                 ansible-playbook -i inventory.txt configure-server.yml
     #         # Here's where you will add some code to rollback on failure
 
-
     configure-infrastructure:
         docker:
-            - image: python:3.7-alpine3.11
+            - image: amazon/aws-cli
         steps:
             - checkout
             - add_ssh_keys:
                 fingerprints: ["bf:83:9f:67:ae:25:38:d2:7a:9d:4b:9b:a4:14:d4:19"]
             - run:
                 name: Install dependencies
-                command: apk add --update ansible
+                command: |
+                    yum install -y openssh-server openssh-clients
+                    yum install -y python3-pip
+                    pip3 install -U ansible
             - attach_workspace:
                 at: ~/
             - run:
@@ -203,7 +206,9 @@ jobs:
                 command: |
                     cd .circleci/ansible
                     ansible-playbook -i inventory.txt configure-server.yml
-
+            # Here's where you will add some code to rollback on failure
+            - destroy-environment:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 #     run-migrations:
 #         docker:
