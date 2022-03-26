@@ -13,13 +13,14 @@
     - ansible_stdout_callback: yaml
 
   pre_tasks:
-    ## 10 minutes is a long time so making it just 3 minutes
+    ## 10 minutes is a long time so making it just 2.5 minutes
     - name: "wait 600 seconds for target connection to become reachable/usable."
       pause:
-        seconds: 180
+        seconds: 150
 
     # - name: "install python for Ansible."
-    #   not needed for ubuntu 20.04
+    # The ubuntu 20.04 image over AWS comes with Python3
+    # So, no need for this step
 
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
