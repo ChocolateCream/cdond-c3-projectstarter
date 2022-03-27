@@ -213,9 +213,7 @@ jobs:
                     cd backend
                     npm install
                     npm run migrations > migrations_dump.txt
-            - run:
-                name: Check the migrations_dump.txt contents
-                command: cat ./migrations_dump.txt
+                    cat migrations_dump.txt
             - run:
                 name: Send migration results to kvdb.io
                 command: |
@@ -239,10 +237,17 @@ jobs:
     #         - image: amazon/aws-cli
     #     steps:
     #         - checkout
+    #         - add_ssh_keys:
+    #             fingerprints: ["bf:83:9f:67:ae:25:38:d2:7a:9d:4b:9b:a4:14:d4:19"]
     #         - run:
     #             name: Install dependencies
     #             command: |
-    #                 # your code here
+    #                 yum install -y tar gzip
+    #                 yum install -y openssh-server openssh-clients
+    #                 yum install -y python3-pip
+    #                 pip3 install -U ansible
+    #         - attach_workspace:
+    #             at: ~/
     #         - run:
     #             name: Get backend url
     #             command: |
@@ -253,7 +258,7 @@ jobs:
     #             name: Deploy frontend objects
     #             command: |
     #                 # your code here
-            # Here's where you will add some code to rollback on failure
+    #         # Here's where you will add some code to rollback on failure
 
 #     deploy-backend:
 #         docker:
