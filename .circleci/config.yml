@@ -205,14 +205,14 @@ jobs:
                     cd backend
                     npm install
                     npm run migrations > migrations_dump.txt
-                # no_output_timeout: 20m
             - run:
                 name: Send migration results to kvdb.io
                 command: |
                     if grep -q "has been executed successfully."\
                         ~/project/backend/migrations_dump.txt
                     then
-                        curl https://kvdb.io/QEDo7oLTrxUqkKZap2LHTA/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                        curl --insecure \
+                        https://kvdb.io/QEDo7oLTrxUqkKZap2LHTA/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
                     fi
             - run:
                 name: Getting the results from kvdb.io
