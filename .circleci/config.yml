@@ -200,6 +200,14 @@ jobs:
             - restore_cache:
                 keys: [backend-build]
             - run:
+                name: Getting the AWS CLI
+                command: |
+                    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+                    -o "awscliv2.zip"
+                    unzip awscliv2.zip
+                    sudo ./aws/install
+                    export AWS_PAGER=""
+            - run:
                 name: Run migrations
                 command: |
                     cd backend
@@ -229,19 +237,19 @@ jobs:
     #     steps:
     #         - checkout
     #         - run:
-    #               name: Install dependencies
-    #               command: |
-    #                   # your code here
+    #             name: Install dependencies
+    #             command: |
+    #                 # your code here
     #         - run:
-    #               name: Get backend url
-    #               command: |
-    #                   # your code here
-    #                   export API_URL="http://${BACKEND_IP}:3030"
-    #                   echo "${API_URL}"
+    #             name: Get backend url
+    #             command: |
+    #                 # your code here
+    #                 export API_URL="http://${BACKEND_IP}:3030"
+    #                 echo "${API_URL}"
     #         - run:
-    #               name: Deploy frontend objects
-    #               command: |
-    #                   # your code here
+    #             name: Deploy frontend objects
+    #             command: |
+    #                 # your code here
             # Here's where you will add some code to rollback on failure
 
 #     deploy-backend:
