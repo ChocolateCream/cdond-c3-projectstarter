@@ -1,21 +1,17 @@
 ---
 ## update apt packages
-## sudo apt-get update
 - name: Updating apt Packages
   become: true
   apt:
     update_cache: true
 
 ## upgrade packages
-## sudo apt-get upgrade
 - name: Upgrading Packages
   become: true
   apt:
     upgrade: true
 
 ## install dependencies, such as NodeJS and NPM
-## sudo apt install nodejs
-## sudo apt install npm
 - name: Installing Dependencies
   become: true
   apt:
