@@ -13,7 +13,7 @@
     - ansible_stdout_callback: yaml
 
   pre_tasks:
-    ## 10 minutes is a long time and no need to wait at all, so making the time 30 secs
+    ## 10 minutes is a long time, so making the time 30 secs
     - name: "wait 30 seconds for target connection to become reachable/usable."
       pause:
         seconds: 30

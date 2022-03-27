@@ -169,26 +169,20 @@ jobs:
 
     configure-infrastructure:
         docker:
-            - image: circleci/node:13.8.0
+            - image: amazon/aws-cli
         steps:
             - checkout
             - add_ssh_keys:
                 fingerprints: ["bf:83:9f:67:ae:25:38:d2:7a:9d:4b:9b:a4:14:d4:19"]
+            - run:
+                name: Install dependencies
+                command: |
+                    yum install -y tar gzip
+                    yum install -y openssh-server openssh-clients
+                    yum install -y python3-pip
+                    pip3 install -U ansible
             - attach_workspace:
                 at: ~/
-            - run:
-                name: Getting Ansible
-                command: |
-                    sudo apt update
-                    sudo apt install ansible
-            - run:
-                name: Getting the AWS CLI
-                command: |
-                    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
-                    -o "awscliv2.zip"
-                    unzip awscliv2.zip
-                    sudo ./aws/install
-                    export AWS_PAGER=""
             - run:
                 name: Configure server
                 command: |
@@ -197,31 +191,6 @@ jobs:
             # Here's where you will add some code to rollback on failure
             - destroy-environment:
                 workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
-
-    # configure-infrastructure:
-    #     docker:
-    #         - image: amazon/aws-cli
-    #     steps:
-    #         - checkout
-    #         - add_ssh_keys:
-    #             fingerprints: ["bf:83:9f:67:ae:25:38:d2:7a:9d:4b:9b:a4:14:d4:19"]
-    #         - run:
-    #             name: Install dependencies
-    #             command: |
-    #                 yum install -y tar gzip
-    #                 yum install -y openssh-server openssh-clients
-    #                 yum install -y python3-pip
-    #                 pip3 install -U ansible
-    #         - attach_workspace:
-    #             at: ~/
-    #         - run:
-    #             name: Configure server
-    #             command: |
-    #                 cd .circleci/ansible
-    #                 ansible-playbook -i inventory.txt configure-server.yml
-    #         # Here's where you will add some code to rollback on failure
-    #         - destroy-environment:
-    #             workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
     run-migrations:
         docker:
