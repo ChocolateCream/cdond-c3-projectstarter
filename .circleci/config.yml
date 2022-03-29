@@ -353,7 +353,7 @@ jobs:
                     then
                         exit 0
                     else
-                        return 1
+                        exit 1
                     fi
             - run:
                   name: Frontend smoke test.
@@ -364,9 +364,9 @@ jobs:
                     then
                         # Change this to 0 after the job fails
                         echo "This should be a success"
-                        return 1
+                        exit 1
                     else
-                        return 1
+                        exit 1
                     fi
             # Here's where you will add some code to rollback on failure
             - empty-s3:
