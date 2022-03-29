@@ -1,5 +1,6 @@
 version: 2.1
 
+
 commands:
     destroy-infra:
         description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -51,6 +52,7 @@ commands:
                         npm install
                         npm run migration:revert
                     fi
+
 
 jobs:
     build-frontend:
@@ -377,10 +379,10 @@ jobs:
                     echo ${URL} 
                     if curl -s ${URL} | grep "Welcome"
                     then
-                        # Change this to 0 after the job fails
-                        echo "This should be a success"
+                        echo "This is a success"
                         exit 0
                     else
+                        echo "This is a failure"
                         exit 1
                     fi
             # Here's where you will add some code to rollback on failure
@@ -389,20 +391,24 @@ jobs:
             - revert-migrations:
                 workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
-#     cloudfront-update:
-#         docker:
-#             # Docker image here that supports AWS CLI
-#         steps:
-#             # Checkout code from git
-#             - run:
-#                   name: Install dependencies
-#                   command: |
-#                       # your code here
-#             - run:
-#                   name: Update cloudfront distribution
-#                   command: |
-#                       # your code here
-#             # Here's where you will add some code to rollback on failure
+    cloudfront-update:
+        docker:
+            - image: amazon/aws-cli
+        steps:
+            - checkout
+            - run:
+                name: Update cloudfront distribution
+                command: |
+                    aws cloudformation deploy \
+                    --template-file .circleci/files/cloudfront.yml \
+                    --stack-name InitialStack \
+                    --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+                    --tags project=udapeople
+            # Here's where you will add some code to rollback on failure
+            - destroy-environment:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+            - revert-migrations:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 # cleanup:
 #     docker:
@@ -451,12 +457,12 @@ workflows:
             - run-migrations:
                 requires: [configure-infrastructure]
             - deploy-frontend:
-                  requires: [run-migrations]
+                requires: [run-migrations]
             - deploy-backend:
-                  requires: [run-migrations]
+                requires: [run-migrations]
             - smoke-test:
-                  requires: [deploy-backend, deploy-frontend]
-            # - cloudfront-update:
-            #       requires: [smoke-test]
+                requires: [deploy-backend, deploy-frontend]
+            - cloudfront-update:
+                requires: [smoke-test]
             # - cleanup:
             #       requires: [cloudfront-update]
