@@ -7,16 +7,16 @@
 
 ## Copy and extract the tar file
 - name: Extracting files
-  unarchive:
+  copy:
     src: ../../artifact.tar.gz
     dest: /home/ubuntu/backend
 
-## Starting the app
-- name: Starting the app
-  shell: |
-    cd /home/ubuntu/backend/dist
-    npm install
-    # npm run build
-    pm2 stop default
-    pm2 start npm -- start
-    # pm2 start "npm -- run main" --name myMainFile
+# ## Starting the app
+# - name: Starting the app
+#   shell: |
+#     cd /home/ubuntu/backend/dist
+#     npm install
+#     # npm run build
+#     pm2 stop default
+#     pm2 start npm -- start
+#     # pm2 start "npm -- run main" --name myMainFile
