@@ -347,12 +347,15 @@ jobs:
             - run:
                 name: sleep for 60 seconds
                 command: |
-                    sleep 60
+                    sleep 20
             - run:
                 name: Backend smoke test.
                 command: |
                     export API_URL="http://${BACKEND_IP}:3030"
+                    echo "The API URL is:"
                     echo "${API_URL}"
+                    echo "\nThe API status URL is:"
+                    echo "${API_URL}/api/status"
                     if curl "${API_URL}/api/status" | grep "ok"
                     then
                         exit 0
