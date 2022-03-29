@@ -346,7 +346,8 @@ jobs:
                     --output text)' >> $BASH_ENV
             - run:
                 name: sleep for 60 seconds
-                command: sleep 60
+                command: |
+                    sleep 60
             - run:
                 name: Backend smoke test.
                 command: |
