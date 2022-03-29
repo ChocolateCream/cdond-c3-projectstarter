@@ -18,5 +18,5 @@
     npm install
     # npm run build
     pm2 stop default
-    # pm2 start npm -- start
-    pm2 start "npm -- run main" --name myMainFile
+    pm2 start npm -- start
+    # pm2 start "npm -- run main" --name myMainFile
