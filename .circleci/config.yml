@@ -345,9 +345,9 @@ jobs:
                     --filters "Name=tag:project,Values=udapeople" \
                     --output text)' >> $BASH_ENV
             - run:
-                name: sleep for 60 seconds
+                name: sleep for 30 seconds
                 command: |
-                    sleep 5
+                    sleep 30
             - run:
                 name: Backend smoke test.
                 command: |
@@ -357,6 +357,7 @@ jobs:
                     echo ""
                     echo "The API status URL is:"
                     echo "${API_URL}/api/status"
+                    echo ""
                     if curl "${API_URL}/api/status" | grep "ok"
                     then
                         exit 0
@@ -421,39 +422,39 @@ jobs:
 workflows:
     default:
         jobs:
-            # - build-frontend
-            # - build-backend
-            # # - test-frontend:
-            # #     requires: [build-frontend]
-            # # - test-backend:
-            # #     requires: [build-backend]
-            # # - scan-frontend:
-            # #     requires: [build-frontend]
-            # # - scan-backend:
-            # #     requires: [build-backend]
-            # - deploy-infrastructure:
-            #     requires:
-            #         [build-frontend, build-backend]
+            - build-frontend
+            - build-backend
+            # - test-frontend:
+            #     requires: [build-frontend]
+            # - test-backend:
+            #     requires: [build-backend]
+            # - scan-frontend:
+            #     requires: [build-frontend]
+            # - scan-backend:
+            #     requires: [build-backend]
+            - deploy-infrastructure:
+                requires:
+                    [build-frontend, build-backend]
 
-            #     # requires:
-            #     #     [test-frontend, test-backend, scan-frontend, scan-backend]
-            #     # filters:
-            #     #     branches:
-            #     #         only: [test-feature-branch]
+                # requires:
+                #     [test-frontend, test-backend, scan-frontend, scan-backend]
+                # filters:
+                #     branches:
+                #         only: [test-feature-branch]
 
-            # - configure-infrastructure:
-            #     requires: [deploy-infrastructure]
-            # - run-migrations:
-            #     requires: [configure-infrastructure]
-            # - deploy-frontend:
-            #       requires: [run-migrations]
-            # - deploy-backend:
-            #       requires: [run-migrations]
-            # - smoke-test:
-            #       requires: [deploy-backend, deploy-frontend]
+            - configure-infrastructure:
+                requires: [deploy-infrastructure]
+            - run-migrations:
+                requires: [configure-infrastructure]
+            - deploy-frontend:
+                  requires: [run-migrations]
+            - deploy-backend:
+                  requires: [run-migrations]
+            - smoke-test:
+                  requires: [deploy-backend, deploy-frontend]
             # - cloudfront-update:
             #       requires: [smoke-test]
             # - cleanup:
             #       requires: [cloudfront-update]
 
-            - smoke-test
+            # - smoke-test
