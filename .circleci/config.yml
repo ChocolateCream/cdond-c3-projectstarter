@@ -1,7 +1,7 @@
 version: 2.1
 
 commands:
-    destroy-environment:
+    destroy-infra:
         description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
         parameters:
             workflowID:
@@ -16,35 +16,41 @@ commands:
                     aws cloudformation delete-stack \
                     --stack-name udapeople-frontend-<<parameters.workflowID>>
 
-    empty-s3:
-        description: deletes all files in an S3 bucket to be able to destroy the stack
+    destroy-environment:
+        description: Delete the S3 objects and destroy back-end and front-end cloudformation stacks given a workflow ID.
         parameters:
             workflowID:
                 type: string
         steps:
             - run:
-                name: Delete S3 bucket objects
+                name: Destroy environments
                 when: on_fail
-                command: aws s3 rm "s3://udapeople-<<parameters.workflowID>>" --recursive
+                command: |
+                    aws s3 rm "s3://udapeople-<<parameters.workflowID>>" --recursive
+                    aws cloudformation delete-stack \
+                    --stack-name udapeople-backend-<<parameters.workflowID>>
+                    aws cloudformation delete-stack \
+                    --stack-name udapeople-frontend-<<parameters.workflowID>>
 
-#     revert-migrations:
-#         description: Revert the last migration if successfully run in the current workflow.
-#         parameters:
-#             # Add parameter here
-#         steps:
-#             - run:
-#                   name: Revert migrations
-#                   # Add when this will run
-#                   command: |
-#                       # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#                       SUCCESS = 1
-#                       if(( $SUCCESS==1 )); 
-#                       then
-#                       #  cd ~/project/backend
-#                       #  npm install
-#                       #  Add revert code here. You can find this in the Getting Started section.
-#                         exit 1
-#                       fi
+    revert-migrations:
+        description: Revert the last migration if successfully run in the current workflow.
+        parameters:
+            workflowID:
+                type: string
+        steps:
+            - run:
+                name: Revert migrations
+                when: on_fail
+                command: |
+                    SUCCESS=$(curl --insecure  \
+                    https://kvdb.io/QEDo7oLTrxUqkKZap2LHTA/migration_<<parameters.workflowID>>)
+                    
+                    if(( $SUCCESS==1 )); 
+                    then
+                        cd ~/project/backend
+                        npm install
+                        npm run migration:revert
+                    fi
 
 jobs:
     build-frontend:
@@ -175,7 +181,7 @@ jobs:
                 paths:
                     - project/.circleci/ansible/inventory.txt
             # Here's where you will add some code to rollback on failure
-            - destroy-environment:
+            - destroy-infra:
                 workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
     configure-infrastructure:
@@ -210,7 +216,7 @@ jobs:
                     cd .circleci/ansible
                     ansible-playbook -i inventory.txt configure-server.yml
             # Here's where you will add some code to rollback on failure
-            - destroy-environment:
+            - destroy-infra:
                 workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
     run-migrations:
@@ -254,7 +260,7 @@ jobs:
                     curl --insecure \
                     https://kvdb.io/QEDo7oLTrxUqkKZap2LHTA/migration_${CIRCLE_WORKFLOW_ID:0:7}
             # Here's where you will add some code to rollback on failure
-            - destroy-environment:
+            - destroy-infra:
                 workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
     deploy-frontend:
@@ -378,10 +384,10 @@ jobs:
                         exit 1
                     fi
             # Here's where you will add some code to rollback on failure
-            # - empty-s3:
-            #     workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
-            # - destroy-environment:
-            #     workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+            - destroy-environment:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+            - revert-migrations:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 #     cloudfront-update:
 #         docker:
