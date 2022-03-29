@@ -333,15 +333,14 @@ jobs:
         docker:
             - image: amazon/aws-cli
         steps:
-            # Checkout code from git
             - checkout
             - run:
                   name: Get backend url
                   command: |
-                    export BACKEND_IP=$(aws ec2 describe-instances \
+                    echo 'export BACKEND_IP=$(aws ec2 describe-instances \
                     --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                    --filters "Name=tag:project,Values=udapeople" \
-                    --output text)
+                    --filters "Name=tag:Project,Values=udacity" \
+                    --output text)' >> $BASH_ENV
             - run:
                 name: Backend smoke test.
                 command: |
