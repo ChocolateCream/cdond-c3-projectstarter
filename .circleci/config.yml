@@ -238,7 +238,7 @@ jobs:
                 name: Print the migrations dump
                 command: |
                     echo "\nPrinting the contents of the migrations_dump.txt file\n"
-                    cat migrations_dump.txt
+                    cat ~/project/backend/migrations_dump.txt
             - run:
                 name: Send migration results to kvdb.io
                 command: |
