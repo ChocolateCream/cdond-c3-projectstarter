@@ -27,3 +27,45 @@
     global: true
     production: true
     state: present
+
+## configure the node exporter
+- name: Configuring node exporter
+  shell: |
+    # This is a script following the one in the link below to install
+    ## prometheus node exporter on an AWS EC2 instance
+    # https://codewizardly.com/prometheus-on-aws-ec2-part2/
+
+    ## Creating a new user 
+    sudo useradd --no-create-home node_exporter
+
+    ## Downloading and extracting the files
+    wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+    tar xzf node_exporter-1.0.1.linux-amd64.tar.gz
+
+    ## Copying the files and cleaning up
+    sudo cp node_exporter-1.0.1.linux-amd64/node_exporter /usr/local/bin/node_exporter
+    rm -rf node_exporter-1.0.1.linux-amd64.tar.gz node_exporter-1.0.1.linux-amd64
+
+    ## Configuring the service
+    sudo touch /etc/systemd/system/node-exporter.service
+    sudo chmod a+rwx /etc/systemd/system/node-exporter.service
+    sudo cat <<-EOF > /etc/systemd/system/node-exporter.service
+    [Unit]
+    Description=Prometheus Node Exporter Service
+    After=network.target
+
+    [Service]
+    User=node_exporter
+    Group=node_exporter
+    Type=simple
+    ExecStart=/usr/local/bin/node_exporter
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+
+    ## Configuring systemd
+    sudo systemctl daemon-reload
+    sudo systemctl enable node-exporter
+    sudo systemctl start node-exporter
+    sudo systemctl status node-exporter
