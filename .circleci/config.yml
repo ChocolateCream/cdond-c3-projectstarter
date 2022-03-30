@@ -434,7 +434,7 @@ jobs:
             - run:
                 name: Remove old stacks and files
                 command: |
-                    if [ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]
+                    if [ "udapeople-${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]
                     then
                         aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
                         aws cloudformation delete-stack --stack-name \
@@ -442,6 +442,11 @@ jobs:
                         aws cloudformation delete-stack --stack-name \
                         "udapeople-frontend-${OldWorkflowID}"
                     fi
+            # Here's where you will add some code to rollback on failure
+            - destroy-environment:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+            - revert-migrations:
+                workflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 
 workflows:
