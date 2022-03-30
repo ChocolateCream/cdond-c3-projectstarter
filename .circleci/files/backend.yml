@@ -40,4 +40,4 @@ Resources:
         - Key: Name
           Value: !Sub backend-${ID}
         - Key: role
-          Value: prometheus-server
+          Value: prometheus-node-exporter
